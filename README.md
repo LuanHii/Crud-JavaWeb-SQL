@@ -1,6 +1,6 @@
 # SIMCO - Sistema de Manutenção de Computadores
 
-Este projeto foi desenvolvido como trabalho acadêmico para a disciplina de XXX na XXXX. O SIMCO é um sistema para gerenciar a manutenção de computadores em laboratórios de uma universidade.
+Este projeto foi desenvolvido como trabalho acadêmico para a disciplina de Programação Orientada a Objeto na UERJ. O SIMCO é um sistema para gerenciar a manutenção de computadores em laboratórios de uma universidade.
 
 ## Funcionalidades
 
