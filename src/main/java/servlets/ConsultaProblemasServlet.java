@@ -1,0 +1,124 @@
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.*;
+
+@WebServlet("/ConsultaProblemasServlet")
+public class ConsultaProblemasServlet extends HttpServlet {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println("<style>");
+        out.println("body {");
+        out.println("    text-align: center;");
+        out.println("    background-color: #ffffe0;");
+        out.println("}");
+        out.println("h1 {");
+        out.println("    margin-top: 50px;");
+        out.println("}");
+        out.println("button {");
+        out.println("    margin-top: 20px;");
+        out.println("    padding: 10px 20px;");
+        out.println("    border-radius: 5px;");
+        out.println("    border: none;");
+        out.println("    cursor: pointer;");
+        out.println("}");
+        out.println("button:hover {");
+        out.println("    transform: scale(1.1);");
+        out.println("    filter: brightness(90%);");
+        out.println("}");
+        out.println("input[type='submit'] {");
+        out.println("    margin-top: 20px;");
+        out.println("    padding: 10px 20px;");
+        out.println("    border-radius: 5px;");
+        out.println("    border: none;");
+        out.println("    cursor: pointer;");
+        out.println("    transition: transform 0.3s ease-in-out;");
+        out.println("}");
+        out.println("input[type='submit']:hover {");
+        out.println("    transform: scale(1.1);");
+        out.println("    filter: brightness(90%);");
+        out.println("}");
+        out.println("</style>");
+
+    
+        String opcaoConsulta = request.getParameter("opcaoConsulta");
+        String sqlQuery = "";
+
+ 
+        String jdbcURL = "jdbc:mysql://localhost:3306/universidade_db";
+        String username = "root";
+        String password = "123456";
+        
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(jdbcURL, username, password);
+
+        
+            if (opcaoConsulta.equals("problemasData")) {
+                String dataInicial = request.getParameter("dataInicial");
+                String dataFinal = request.getParameter("dataFinal");
+                sqlQuery = "SELECT * FROM problemas WHERE date BETWEEN '" + dataInicial + "' AND '" + dataFinal + "'";
+            } else if (opcaoConsulta.equals("problemasLaboratorio")) {
+                String labEspecifico = request.getParameter("labEspecifico");
+                sqlQuery = "SELECT * FROM problemas WHERE id_lab = '" + labEspecifico + "'";
+            } else if (opcaoConsulta.equals("problemasUsuario")) {
+                String nomeUsuario = request.getParameter("idUsuario");
+                sqlQuery = "SELECT * FROM problemas WHERE id_user = '" + nomeUsuario + "'";
+            } else if (opcaoConsulta.equals("problemasComputador")) {
+                String idPC = request.getParameter("idPC");
+                sqlQuery = "SELECT * FROM problemas WHERE id_pc = '" + idPC + "'";
+            } else if (opcaoConsulta.equals("problemasHardware")) {
+                sqlQuery = "SELECT * FROM problemas WHERE tipo = 'hardware'";
+            } else if (opcaoConsulta.equals("problemasSoftware")) {
+                sqlQuery = "SELECT * FROM problemas WHERE tipo = 'software'";
+            }
+            else if (opcaoConsulta.equals("todosProblemas")) {
+                sqlQuery = "SELECT * FROM problemas";
+            }
+
+            
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+      
+            out.println("<html><body>");
+            out.println("<h2>Resultados da Consulta:</h2>");
+            out.println("<table border='1'>");
+            while (resultSet.next()) {
+              
+                out.println("====================" + "<br>" +
+                		"ID do PC: " + resultSet.getInt("id_pc") + "<br>" 
+                   		+ "ID do Usuário: "+resultSet.getInt("id_user") + "<br>"
+                		+"Descrição do problema: "+resultSet.getString("descr") + "<br>" 
+                        +"Tipo de problema: "+resultSet.getString("tipo") + "<br>" 
+               		    +"Data do cadastro do problema: "+resultSet.getDate("date") + "<br>" + "====================" + "<br>");
+                
+                
+            }
+            out.println("</table>");
+            out.println("<a href='index.jsp'>Retornar ao Index</a>");
+            out.println("</body></html>");
+
+           
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException | ClassNotFoundException ex) {
+            out.println("Erro: " + ex.getMessage());
+        } finally {
+            out.close();
+        }
+    }
+}
